@@ -1,0 +1,22 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+  }
+}
+
+allprojects {
+  group = 'com.nicstrong.add'
+
+  repositories {
+    mavenCentral()
+  }
+
+  tasks.withType(Compile) {
+    options.encoding = "UTF-8"
+  }
+}
+

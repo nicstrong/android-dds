@@ -1,0 +1,18 @@
+apply plugin: 'android-library'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 19
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    compile 'com.google.guava:guava:16.0.+'
+    compile 'com.jakewharton.timber:timber:2.2.+'
+}
+
