@@ -1,14 +1,26 @@
 package com.nicstrong.spark.route;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.nicstrong.spark.HttpMethod;
+import com.nicstrong.spark.util.MimeParse;
 import com.nicstrong.spark.util.SparkUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
 public class SimpleRouteMatcher implements RouteMatcher {
     private List<RouteEntry> routes;
+
+
+    public SimpleRouteMatcher() {
+        routes = Lists.newArrayList();
+    }
 
     @Override
     public void parseValidateAddRoute(String httpMethod, String route, String acceptType, Object target) {
@@ -24,6 +36,92 @@ public class SimpleRouteMatcher implements RouteMatcher {
             return;
         }
         addRoute(method, route, acceptType, target);
+    }
+
+    @Override public void clearRoutes() {
+        routes.clear();
+    }
+
+    @Override
+    public List<RouteMatch> findTargetsForRequestedRoute(HttpMethod httpMethod, String path, String acceptType) {
+        List<RouteMatch> matchSet = new ArrayList<RouteMatch>();
+
+        List<RouteEntry> routeEntries =  this.findTargetsForRequestedRoute(httpMethod, path);
+
+        for (RouteEntry routeEntry : routeEntries) {
+
+            if(acceptType != null) {
+                String bestMatch = MimeParse.bestMatch(Arrays.asList(routeEntry.acceptedType), acceptType);
+
+                if(routeWithGivenAcceptType(bestMatch)) {
+                    matchSet.add(new RouteMatch(httpMethod, routeEntry.target, routeEntry.path, path, acceptType));
+                }
+            } else {
+                matchSet.add(new RouteMatch(httpMethod, routeEntry.target, routeEntry.path, path, acceptType));
+            }
+
+        }
+
+        return matchSet;
+    }
+
+    @Override
+    public RouteMatch findTargetForRequestedRoute(HttpMethod httpMethod, String path, String acceptType) {
+        List<RouteEntry> routeEntries =  this.findTargetsForRequestedRoute(httpMethod, path);
+        RouteEntry entry = findTargetWithGivenAcceptType(routeEntries, acceptType);
+        return entry != null ? new RouteMatch(httpMethod, entry.target, entry.path, path, acceptType) : null;
+    }
+
+    private RouteEntry findTargetWithGivenAcceptType(List<RouteEntry> routeMatchs, String acceptType) {
+
+        if(acceptType != null && routeMatchs.size() > 0) {
+
+            Map<String, RouteEntry> acceptedMimeTypes = getAcceptedMimeTypes(routeMatchs);
+            String bestMatch = MimeParse.bestMatch(acceptedMimeTypes.keySet(), acceptType);
+
+
+            if(routeWithGivenAcceptType(bestMatch)) {
+                return acceptedMimeTypes.get(bestMatch);
+            } else {
+                return null;
+            }
+
+        } else {
+
+            if(routeMatchs.size() > 0) {
+                return routeMatchs.get(0);
+            }
+
+        }
+
+        return null;
+    }
+
+    private boolean routeWithGivenAcceptType(String bestMatch) {
+        return !MimeParse.NO_MIME_TYPE.equals(bestMatch);
+    }
+
+
+    private Map<String, RouteEntry> getAcceptedMimeTypes(List<RouteEntry> routes) {
+        Map<String, RouteEntry> acceptedTypes = Maps.newHashMap();
+
+        for (RouteEntry routeEntry : routes) {
+            if(!acceptedTypes.containsKey(routeEntry.acceptedType)) {
+                acceptedTypes.put(routeEntry.acceptedType, routeEntry);
+            }
+        }
+
+        return acceptedTypes;
+    }
+
+    private List<RouteEntry> findTargetsForRequestedRoute(HttpMethod httpMethod, String path) {
+        List<RouteEntry> matchSet = new ArrayList<RouteEntry>();
+        for (RouteEntry entry : routes) {
+            if (entry.matches(httpMethod, path)) {
+                matchSet.add(entry);
+            }
+        }
+        return matchSet;
     }
 
 

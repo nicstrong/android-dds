@@ -5,7 +5,13 @@ import org.apache.http.protocol.HttpRequestHandlerResolver;
 
 
 public class RouteMatcherRequestHandlerResolver implements HttpRequestHandlerResolver {
+    private final MatcherApacheHttpHandler apacheHttpHandler;
+
+    public RouteMatcherRequestHandlerResolver(MatcherApacheHttpHandler apacheHttpHandler) {
+        this.apacheHttpHandler = apacheHttpHandler;
+    }
+
     @Override public HttpRequestHandler lookup(String requestUri) {
-        return null;
+        return apacheHttpHandler;
     }
 }

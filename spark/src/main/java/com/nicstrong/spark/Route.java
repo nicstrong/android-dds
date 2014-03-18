@@ -1,6 +1,6 @@
 package com.nicstrong.spark;
 
-public class Route {
+public abstract class Route extends AbstractRoute {
     private static final String DEFAULT_ACCEPT_TYPE = "*/*";
     private final String path;
 
@@ -13,6 +13,16 @@ public class Route {
     protected Route(String path, String acceptType) {
         this.path = path;
         this.acceptType = acceptType;
+    }
+
+    public abstract Object handle(Request request, Response response);
+
+    public String render(Object element) {
+        if(element != null) {
+            return element.toString();
+        } else {
+            return null;
+        }
     }
 
     public String getAcceptType() {
