@@ -39,7 +39,7 @@ public class MatcherApacheHttpHandler implements HttpRequestHandler {
     public void handle(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws HttpException, IOException {
         String httpMethodStr = httpRequest.getRequestLine().getMethod().toUpperCase();
 
-        if (httpRequest instanceof HttpEntityEnclosingRequest && HttpMethod.hasRequestBody(httpMethodStr)) {
+        if (httpRequest instanceof HttpEntityEnclosingRequest && !HttpMethod.hasRequestBody(httpMethodStr)) {
             Timber.w("Protocol error entity present on HEAD or GET");
             throw new ProtocolException("Entity present on HEAD or GET request");
         }

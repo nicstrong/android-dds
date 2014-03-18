@@ -1,7 +1,7 @@
 package com.nicstrong.spark;
 
 public enum HttpMethod {
-    GET, POST, PUT, DELETE, PATCH, BEFORE, AFTER;
+    GET, POST, PUT, DELETE, HEAD, PATCH, BEFORE, AFTER;
 
     public static boolean hasRequestBody(String method) {
         return method.equals(POST.name())

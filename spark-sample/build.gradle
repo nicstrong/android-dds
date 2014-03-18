@@ -19,5 +19,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    compile project(':spark')
+    compile 'com.google.guava:guava:16.0.+'
+    compile 'com.jakewharton.timber:timber:2.2.+'
 }

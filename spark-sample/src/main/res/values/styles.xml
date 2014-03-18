@@ -5,4 +5,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="HeadingTextAppearance" parent="android:TextAppearance.Holo">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#ff787878</item>
+        <item name="android:layout_marginTop">8sp</item>
+        <item name="android:layout_marginBottom">4sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>
