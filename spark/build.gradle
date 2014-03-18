@@ -14,5 +14,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     compile 'com.google.guava:guava:16.0.+'
     compile 'com.jakewharton.timber:timber:2.2.+'
+    compile 'com.google.code.gson:gson:2.2.+'
 }
 
