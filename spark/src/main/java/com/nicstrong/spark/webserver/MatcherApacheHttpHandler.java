@@ -108,7 +108,7 @@ public class MatcherApacheHttpHandler implements HttpRequestHandler {
                 } catch (HaltException hEx) { // NOSONAR
                     throw hEx; // NOSONAR
                 } catch (Exception e) {
-                    Timber.e(e, "");
+                    Timber.e(e, "Server internal error");
                     httpResponse.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                     bodyContent = INTERNAL_ERROR;
                 }

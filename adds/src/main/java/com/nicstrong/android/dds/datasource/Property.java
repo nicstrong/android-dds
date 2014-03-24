@@ -1,4 +1,4 @@
-package com.nicstrong.android.dds.module;
+package com.nicstrong.android.dds.datasource;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -9,4 +9,5 @@ public interface Property {
     JsonElement toJson(JsonSerializationContext context);
     void fromJson(JsonElement element, JsonDeserializationContext context);
 
+    String getName();
 }

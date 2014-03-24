@@ -1,1 +1,1 @@
-include ':adds', ':spark-sample', 'spark'
+include ':adds', ':adds-sample', ':spark', ':spark-sample'

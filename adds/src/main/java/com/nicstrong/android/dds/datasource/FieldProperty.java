@@ -1,4 +1,4 @@
-package com.nicstrong.android.dds.module;
+package com.nicstrong.android.dds.datasource;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
@@ -35,5 +35,9 @@ public class FieldProperty implements Property {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("FieldProperty created for field with no access: " + field.getName());
         }
+    }
+
+    @Override public String getName() {
+        return field.getName();
     }
 }
