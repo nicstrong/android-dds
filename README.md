@@ -83,6 +83,9 @@ Now the debug data can be queried/updated using simple curl commands.
 ```
 
 #### Set a property
-    curl -X PUT -H "Content-Type: application/json" -d '{"value": "Test 12345!!!"}' http://localhost:8080/source/DebugData/STRING_VALUE
+    curl -X PUT \
+         -H "Content-Type: application/json" \
+         -d '{"value": "Test 12345!!!"}' \
+         http://localhost:8080/source/DebugData/STRING_VALUE
 
 Because the main activity has registered to track changes as you change properties you should see them reflected in the main activity on the application.
