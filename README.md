@@ -8,7 +8,8 @@ Create a service to host the debug data server. And override ```onBuildServer()`
 
 ```java
 @Override public void onBuildServer(DebugDataServer.Builder builder) {
-    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+    SharedPreferences sharedPrefs
+            = PreferenceManager.getDefaultSharedPreferences(this);
     builder.interfaceName(sharedPrefs.getString(PREF_INTERFACE_NAME, "lo"))
             .port(sharedPrefs.getInt(PREF_PORT, 8080))
             .addStaticClass(DebugData.class);
@@ -38,9 +39,8 @@ Now the debug data can be queried/updated using simple curl commands.
 
 #### Show the configured data sources
 
-```sh
-curl http://localhost:8080/source
-```
+    curl http://localhost:8080/source
+
 
 ```javascript
 {
@@ -54,9 +54,7 @@ curl http://localhost:8080/source
 
 #### Show the a data source
 
-```sh
-curl http://localhost:8080/source/DebugData
-```
+    curl http://localhost:8080/source/DebugData
 
 ```javascript
 {
@@ -73,9 +71,8 @@ curl http://localhost:8080/source/DebugData
 ```
 
 #### Show a property
-```sh
-curl http://localhost:8080/source/DebugData/STRING_VALUE
-```
+
+    curl http://localhost:8080/source/DebugData/STRING_VALUE
 
 ```javascript
 {
@@ -86,8 +83,6 @@ curl http://localhost:8080/source/DebugData/STRING_VALUE
 ```
 
 #### Set a property
-```sh
-curl -X PUT -H "Content-Type: application/json" -d '{"value": "Test 12345!!!"}' http://localhost:8080/source/DebugData/STRING_VALUE
-```
+    curl -X PUT -H "Content-Type: application/json" -d '{"value": "Test 12345!!!"}' http://localhost:8080/source/DebugData/STRING_VALUE
 
 Because the main activity has registered to track changes as you change properties you should see them reflected in the main activity on the application.
