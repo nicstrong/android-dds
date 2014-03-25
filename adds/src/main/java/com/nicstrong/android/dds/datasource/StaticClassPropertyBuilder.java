@@ -8,7 +8,7 @@ import static com.nicstrong.android.dds.utils.Fields.isFinal;
 import static com.nicstrong.android.dds.utils.Fields.isPublic;
 import static com.nicstrong.android.dds.utils.Fields.isStatic;
 
-public class StaticClassPropertyBuilder extends ClassReflectionPropertyBuilder {
+public class StaticClassPropertyBuilder extends ClassReflectionPropertiesBuilder {
     public StaticClassPropertyBuilder addClass(Class<?> clazz) {
         scanClass(clazz, STATIC_FIELD_PREDICATE);
         return this;

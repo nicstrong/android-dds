@@ -10,12 +10,13 @@ import android.os.ResultReceiver;
 
 import com.nicstrong.android.dds.datasource.DataSource;
 import com.nicstrong.android.dds.datasource.DataSourceRegistry;
+import com.nicstrong.android.dds.datasource.Property;
 import com.nicstrong.android.dds.datasource.PropertyDataSource;
 import com.nicstrong.android.dds.datasource.StaticClassPropertyBuilder;
-import com.nicstrong.spark.GsonTransformer;
+import com.nicstrong.android.dds.datasource.gson.PropertyServerRequest;
+import com.nicstrong.android.dds.datasource.gson.PropertyServerResponse;
 import com.nicstrong.spark.Request;
 import com.nicstrong.spark.Response;
-import com.nicstrong.spark.Route;
 import com.nicstrong.spark.Spark;
 
 import org.apache.http.HttpStatus;
@@ -25,18 +26,18 @@ import java.io.IOException;
 import timber.log.Timber;
 
 import static com.nicstrong.spark.Spark.get;
-import static com.nicstrong.spark.Spark.post;
+import static com.nicstrong.spark.Spark.put;
 
 public class DebugDataServer {
 
     private static DebugDataServer defaultInstance;
-    public DataSourceRegistry dataSourcesRegistry;
+    public DataSourceRegistry dataSourceRegistry;
     private final String interfaceName;
     private final int port;
 
-    public DebugDataServer(DataSourceRegistry dataSourcesRegistry, String interfaceName, int port) {
+    public DebugDataServer(DataSourceRegistry dataSourceRegistry, String interfaceName, int port) {
         this.defaultInstance = this;
-        this.dataSourcesRegistry = dataSourcesRegistry;
+        this.dataSourceRegistry = dataSourceRegistry;
         this.interfaceName = interfaceName;
         this.port = port;
     }
@@ -45,32 +46,66 @@ public class DebugDataServer {
         return new Builder();
     }
 
-    public static void start(Context context, Handler handler, Class<? extends Service> serviceClass, OnDebugDataServerStartedListener listener) {
+    public static void start(Context context, Class<? extends Service> serviceClass, OnDebugDataServerStartedListener listener) {
         Intent intent = new Intent(context, serviceClass);
         intent.setAction(DebugDataServerService.ACTION_START);
-        intent.putExtra(DebugDataServerService.EXTRA_ON_START_LISTENER, new ListenerResultReceiver(handler, listener));
+        intent.putExtra(DebugDataServerService.EXTRA_ON_START_LISTENER, new ListenerResultReceiver(null, listener));
         context.startService(intent);
 
     }
 
-   public void init(Context context) {
+   public DebugDataServer init(Context context) {
        try {
 
-           get(new DebugDataServerRoute("/sources") {
+           get(new DebugDataServerRoute("/source") {
                @Override
                public Object handle(Request request, Response response) {
-                   return dataSourcesRegistry;
+                   return json(dataSourceRegistry);
                }
            });
 
-           get(new DebugDataServerRoute("/source/:name") {
+           get(new DebugDataServerRoute("/source/:sourceName") {
                @Override
                public Object handle(Request request, Response response) {
-                   DataSource dataSource = dataSourcesRegistry.get(request.params(":name"));
+                   DataSource dataSource = dataSourceRegistry.get(request.params(":sourceName"));
                    if (dataSource == null) {
-                       return error(response, HttpStatus.SC_NOT_FOUND, "No such dataSource " + request.params(":name"));
+                       return json(error(response, HttpStatus.SC_NOT_FOUND, "No such dataSource " + request.params(":sourceName")));
                    }
-                   return dataSource;
+                   return json(dataSource);
+               }
+           });
+
+           get(new DebugDataServerRoute("/source/:sourceName/:propertyName") {
+               @Override
+               public Object handle(Request request, Response response) {
+                   DataSource dataSource = dataSourceRegistry.get(request.params(":sourceName"));
+                   if (dataSource == null) {
+                       return error(response, HttpStatus.SC_NOT_FOUND, "No such dataSource " + request.params(":sourceName"));
+                   }
+                   Property property =dataSource.getProperty(request.params(":propertyName"));
+                   if (property == null) {
+                       return error(response, HttpStatus.SC_NOT_FOUND, "No such property " + request.params(":propertyName"));
+                   }
+
+                  return json(new PropertyServerResponse(property));
+               }
+           });
+
+           put(new DebugDataServerRoute("/source/:sourceName/:propertyName") {
+               @Override
+               public Object handle(Request request, Response response) {
+                   DataSource dataSource = dataSourceRegistry.get(request.params(":sourceName"));
+                   if (dataSource == null) {
+                       return error(response, HttpStatus.SC_NOT_FOUND, "No such dataSource " + request.params(":sourceName"));
+                   }
+                   String propertyName = request.params(":propertyName");
+                   if (!dataSource.containsProperty(propertyName)) {
+                       return error(response, HttpStatus.SC_NOT_FOUND, "No such property " + propertyName);
+                   }
+                   PropertyServerRequest prop = propertyFromBody(request.body(), dataSource.getPropertyType(propertyName));
+                   dataSource.setPropertyValue(propertyName, prop.getValue());
+
+                   return "";
                }
            });
 
@@ -78,6 +113,8 @@ public class DebugDataServer {
        } catch (IOException ex) {
            Timber.e(ex, "Failed to initialise spark");
        }
+
+       return this;
    }
 
     public static DebugDataServer getDefault() {
@@ -85,6 +122,10 @@ public class DebugDataServer {
             throw new IllegalStateException("Must build DebugDataServer before calling getDefault()");
         }
         return defaultInstance;
+    }
+
+    public DataSourceRegistry getDataSourceRegistry() {
+        return dataSourceRegistry;
     }
 
     public static class Builder {
@@ -121,7 +162,7 @@ public class DebugDataServer {
         }
     }
 
-    private static class ListenerResultReceiver extends ResultReceiver {
+    static class ListenerResultReceiver extends ResultReceiver {
         private final OnDebugDataServerStartedListener listener;
 
         public ListenerResultReceiver(Handler handler, OnDebugDataServerStartedListener listener) {

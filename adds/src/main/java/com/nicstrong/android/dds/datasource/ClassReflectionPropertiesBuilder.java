@@ -9,11 +9,11 @@ import static com.google.common.collect.Iterators.filter;
 import static com.google.common.collect.Iterators.forArray;
 import static com.google.common.collect.Iterators.transform;
 
-class ClassReflectionPropertyBuilder extends AbstractPropertyBuilder {
+class ClassReflectionPropertiesBuilder extends AbstractPropertiesBuilder {
     protected void scanClass(Class<?> clazz, Predicate<Field> predicate) {
         addProperties(transform(filter(forArray(clazz.getFields()), predicate), new Function<Field, Property>() {
             @Override public Property apply(Field input) {
-                return new FieldProperty(input);
+                return new Property(new FieldPropertySource(input));
             }
         }));
     }

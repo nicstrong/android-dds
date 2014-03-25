@@ -38,6 +38,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -155,7 +156,7 @@ public class SparkServerApacheHttp implements SparkServer {
             try {
                 initialiseHttpService(context, args.host, args.port);
             } catch (IOException e) {
-                Timber.e(e,  "Unable to initialise the Http Service");
+                Timber.e(e, "Unable to initialise the Http Service");
                 return;
             }
 
@@ -209,6 +210,8 @@ public class SparkServerApacheHttp implements SparkServer {
                     this.httpservice.handleRequest(this.conn, context);
                 }
             } catch (ConnectionClosedException ex) {
+                Timber.e("Client closed connection");
+            } catch (SocketTimeoutException ex) {
                 Timber.e("Client closed connection");
             } catch (IOException ex) {
                 Timber.e(ex, "I/O error: ");

@@ -3,6 +3,7 @@ package com.nicstrong.android.dds;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 
 
 public abstract class DebugDataServerService extends Service {
@@ -20,6 +21,10 @@ public abstract class DebugDataServerService extends Service {
             DebugDataServer.Builder builder = DebugDataServer.builder();
             onBuildServer(builder);
             builder.build().init(this);
+            if (intent.getExtras().containsKey(EXTRA_ON_START_LISTENER)) {
+                ResultReceiver resultReceiver = intent.getParcelableExtra(EXTRA_ON_START_LISTENER);
+                resultReceiver.send(0, null);
+            }
             return START_STICKY;
         }
 

@@ -5,10 +5,10 @@ import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractPropertyBuilder implements PropertyBuilder {
+public abstract class AbstractPropertiesBuilder implements PropertiesBuilder {
     List<Property> properties;
 
-    protected AbstractPropertyBuilder() {
+    protected AbstractPropertiesBuilder() {
         properties = Lists.newArrayList();
     }
 

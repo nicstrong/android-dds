@@ -1,13 +1,30 @@
 package com.nicstrong.android.dds.datasource;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
 
-public interface Property {
+public class Property {
+    private final PropertySource propertySource;
 
-    JsonElement toJson(JsonSerializationContext context);
-    void fromJson(JsonElement element, JsonDeserializationContext context);
+    public Property(PropertySource propertySource) {
+        this.propertySource = propertySource;
+    }
 
-    String getName();
+    public String getName() {
+        return propertySource.getName();
+    }
+
+    public Object getValue() {
+        return propertySource.getValue();
+    }
+
+    public PropertySource getPropertySource() {
+        return propertySource;
+    }
+
+    public void setValue(Object value) {
+        this.propertySource.setValue(value);
+    }
+
+    public Class<?> getType() {
+        return this.propertySource.getType();
+    }
 }

@@ -14,7 +14,7 @@ public class PropertyDataSource implements DataSource {
     private final List<OnPropertyChangedListener> listeners;
     private final String name;
 
-    public PropertyDataSource(String name, final AbstractPropertyBuilder propertyBuilder) {
+    public PropertyDataSource(String name, final AbstractPropertiesBuilder propertyBuilder) {
         this.name = name;
         properties = Maps.uniqueIndex(propertyBuilder.build(), new Function<Property, String>() {
             @Override public String apply(Property input) {
@@ -32,13 +32,28 @@ public class PropertyDataSource implements DataSource {
         return properties.values();
     }
 
+    @Override public boolean containsProperty(String propertyName) {
+        return properties.containsKey(propertyName);
+    }
+
     @Override public Property getProperty(String propertyName) {
         return  properties.get(propertyName);
     }
 
+    @Override public void setPropertyValue(String propertyName, Object value) {
+        Property property = getProperty(propertyName);
+        property.setValue(value);
+        for (OnPropertyChangedListener listener: listeners) {
+            listener.onPropertyChanged(property);
+        }
+    }
+
+    @Override public Class<?> getPropertyType(String propertyName) {
+        return  getProperty(propertyName).getType();
+    }
+
     @Override public void setProperty(String propertyName, Property property) {
         properties.put(propertyName, property);
-
         for (OnPropertyChangedListener listener: listeners) {
             listener.onPropertyChanged(property);
         }

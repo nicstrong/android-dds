@@ -2,6 +2,6 @@ package com.nicstrong.android.dds.datasource;
 
 import java.util.List;
 
-public interface PropertyBuilder {
+public interface PropertiesBuilder {
     List<Property> build();
 }
